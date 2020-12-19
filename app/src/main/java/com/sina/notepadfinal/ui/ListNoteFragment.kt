@@ -48,7 +48,10 @@ class ListNoteFragment : Fragment() {
                 when (view.id) {
                     R.id.img_delete -> {
                         db.listOfNotes.removeAt(position)
-                        activity?.recreate()
+                        binding.rvNotes.removeViewAt(position)
+                        binding.rvNotes.adapter?.notifyItemRemoved(position)
+                        binding.rvNotes.adapter?.notifyItemRangeChanged(position, db.listOfNotes.size);
+
 
                     }
                     R.id.img_edit -> {
@@ -77,9 +80,10 @@ class ListNoteFragment : Fragment() {
                 }
                 true
             }
+            val mAdapter=MyRecyclerAdapter(db.listOfNotes,myClickListener,myLongClickListener)
             binding.tvShowEmptyList.visibility = View.GONE
             binding.rvNotes.visibility = View.VISIBLE
-            binding.rvNotes.adapter = MyRecyclerAdapter(db.listOfNotes,myClickListener,myLongClickListener)
+            binding.rvNotes.adapter = mAdapter
 
         }
 

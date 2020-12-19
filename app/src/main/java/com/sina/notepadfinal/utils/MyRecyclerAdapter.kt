@@ -53,4 +53,5 @@ class MyRecyclerAdapter(
     override fun getItemCount(): Int {
         return listNotes.size
     }
+
 }
