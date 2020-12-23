@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.sina.notepadfinal.datamodel.Note
 import com.sina.notepadfinal.R
 import com.sina.notepadfinal.databinding.FragmentEditNoteBinding
+import com.sina.notepadfinal.db.MyRoomDataBase
+import com.sina.notepadfinal.db.NoteDao
 import com.sina.notepadfinal.utils.hideKeyboard
 import com.sina.notepadfinal.utils.toEditable
 import java.util.*
@@ -18,6 +22,7 @@ import java.util.*
 class EditNoteFragment : Fragment() {
 
     lateinit var binding: FragmentEditNoteBinding
+    lateinit var roomDataBase:MyRoomDataBase
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -29,6 +34,7 @@ class EditNoteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         var inEditMode=false
         val position=EditNoteFragmentArgs.fromBundle(requireArguments()).position
         if (position != -1) {
@@ -47,9 +53,14 @@ class EditNoteFragment : Fragment() {
                 val date=Date().time
                 val myNote = Note(title, noteValue,date)
                 if (inEditMode) {
-                    db.listOfNotes[position]=myNote
+//                    db.listOfNotes[position]=myNote
+                    roomDataBase.noteDao().update(myNote)
+
                 }else{
-                    db.addToList(myNote)
+//                    db.addToList(myNote)
+                    //val db=NoteDao()
+                    roomDataBase=MyRoomDataBase.getDatabase(requireActivity().applicationContext)
+                    roomDataBase.noteDao().insert(myNote)
                 }
                 //close keyboard
                 hideKeyboard()
@@ -60,6 +71,8 @@ class EditNoteFragment : Fragment() {
             }
         }
     }
+
+
 
 
 }

@@ -1,5 +1,6 @@
 package com.sina.notepadfinal.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.text.Editable
@@ -20,6 +21,7 @@ fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
+@SuppressLint("SimpleDateFormat")
 fun Long.reformat(): String {
     val df=SimpleDateFormat("(yyyy/MM/dd - HH:mm)")
     return df.format(this)

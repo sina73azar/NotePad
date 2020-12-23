@@ -13,6 +13,7 @@ import com.sina.notepadfinal.utils.MyRecyclerAdapter
 import com.sina.notepadfinal.R
 import com.sina.notepadfinal.databinding.FragmentListNoteBinding
 import com.sina.notepadfinal.db.MyDb
+import com.sina.notepadfinal.db.MyRoomDataBase
 
 
 val db=MyDb()
@@ -47,10 +48,19 @@ class ListNoteFragment : Fragment() {
             val myClickListener:(position:Int,view:View)->Unit={ position: Int, view: View ->
                 when (view.id) {
                     R.id.img_delete -> {
-                        db.listOfNotes.removeAt(position)
+//                        db.listOfNotes.removeAt(position)
+                        val roomDb = MyRoomDataBase.getDatabase(requireContext())
+                        val rowCount=roomDb.noteDao().getCount()
+                        val int1=rowCount?.value
+                        roomDb.noteDao().deleteById(position)
                         binding.rvNotes.removeViewAt(position)
                         binding.rvNotes.adapter?.notifyItemRemoved(position)
-                        binding.rvNotes.adapter?.notifyItemRangeChanged(position, db.listOfNotes.size);
+                        if (int1 != null) {
+                            binding.rvNotes.adapter?.notifyItemRangeChanged(
+                                position,
+                                int1
+                            )
+                        };
 
 
                     }

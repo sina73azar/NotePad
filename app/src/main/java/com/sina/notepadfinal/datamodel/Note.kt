@@ -2,34 +2,30 @@ package com.sina.notepadfinal.datamodel
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.sina.notepadfinal.datamodel.Note.CREATOR.TABLE_NAME
+import com.sina.notepadfinal.datamodel.Note.Companion.TABLE_NAME
+import kotlinx.android.parcel.Parcelize
 
-data class Note(val title:String,val noteValue:String="",val date:Long):Parcelable{
-    constructor(parcel: Parcel) : this(
-        parcel.readString()!!,
-        parcel.readString()!!,
-        parcel.readLong()
-    ) {
+
+@Entity(tableName =TABLE_NAME,
+        indices =[Index(value = ["title","noteValue","date"],unique = true)] )
+@Parcelize
+data class Note(@PrimaryKey(autoGenerate = true)
+                val did:Int,
+                @ColumnInfo(name = "title")val title: String,
+                @ColumnInfo(name = "noteValue")val noteValue: String = "",
+                @ColumnInfo(name = "date")val date: Long):Parcelable{
+
+    companion object{
+        const val TABLE_NAME="note_table"
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(title)
-        parcel.writeString(noteValue)
-        parcel.writeLong(date)
-    }
 
-    override fun describeContents(): Int {
-        return 0
-    }
 
-    companion object CREATOR : Parcelable.Creator<Note> {
-        override fun createFromParcel(parcel: Parcel): Note {
-            return Note(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Note?> {
-            return arrayOfNulls(size)
-        }
-    }
 
 
 }
