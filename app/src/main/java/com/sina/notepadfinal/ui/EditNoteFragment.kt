@@ -7,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.sina.notepadfinal.datamodel.Note
 import com.sina.notepadfinal.R
 import com.sina.notepadfinal.databinding.FragmentEditNoteBinding
@@ -20,59 +18,52 @@ import java.util.*
 
 
 class EditNoteFragment : Fragment() {
-
+    lateinit var dao:NoteDao
     lateinit var binding: FragmentEditNoteBinding
-    lateinit var roomDataBase:MyRoomDataBase
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding=FragmentEditNoteBinding.inflate(inflater)
+        binding = FragmentEditNoteBinding.inflate(inflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dao= MyRoomDataBase.getDatabase(requireActivity().applicationContext).getNoteDao()
+        val curNote = EditNoteFragmentArgs.fromBundle(requireArguments()).curNote
+        //decide we are in add or edit mode
+        val isInAddMode = curNote.date == 1L
+        if (isInAddMode) {
+            //we are in add mode
 
-        var inEditMode=false
-        val position=EditNoteFragmentArgs.fromBundle(requireArguments()).position
-        if (position != -1) {
-            val item=db.listOfNotes[position]
-
-            binding.etGetTitle.text=item.title.toEditable()
-            binding.etValueNote.text=item.noteValue.toEditable()
-            inEditMode=true
-            binding.btnSaveNote.text=getString(R.string.text_btn_edit)
+        } else {
+            //we are in edit mode
+            binding.etGetTitle.text = curNote.title.toEditable()
+            binding.etValueNote.text = curNote.noteValue.toEditable()
+            binding.btnSaveNote.text = getString(R.string.text_btn_edit)
         }
 
-        binding.btnSaveNote.setOnClickListener {
-            val title=binding.etGetTitle.text.toString()
-            val noteValue=binding.etValueNote.text.toString()
-            if (title.isNotEmpty()) {
-                val date=Date().time
-                val myNote = Note(title, noteValue,date)
-                if (inEditMode) {
-//                    db.listOfNotes[position]=myNote
-                    roomDataBase.noteDao().update(myNote)
 
-                }else{
-//                    db.addToList(myNote)
-                    //val db=NoteDao()
-                    roomDataBase=MyRoomDataBase.getDatabase(requireActivity().applicationContext)
-                    roomDataBase.noteDao().insert(myNote)
+        binding.btnSaveNote.setOnClickListener {
+            val title = binding.etGetTitle.text.toString()
+            val noteValue = binding.etValueNote.text.toString()
+            if (title.isNotEmpty()) {
+                val date = Date().time
+                if (isInAddMode) {
+                    dao.insertNote(Note(title, noteValue, date))
+                } else {
+                    dao.updateNote(Note(title, noteValue, date, curNote.id))
                 }
                 //close keyboard
                 hideKeyboard()
                 //navigate back to list fragment
                 findNavController().navigate(R.id.action_editNoteFragment_to_listNoteFragment)
-            } else {
-                Toast.makeText(activity, "enter title", Toast.LENGTH_SHORT).show()
-            }
+            } else Toast.makeText(activity, "enter title", Toast.LENGTH_SHORT).show()
+
         }
     }
-
-
-
 
 }

@@ -11,8 +11,9 @@
         android:id="@+id/tv_show_empty_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="لیست شما خالی هست"
-        android:textSize="18sp"
+        android:text="@string/text_empty_list"
+        android:textSize="22sp"
+        android:padding="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,9 +35,14 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
 
-        app:backgroundTint="@color/material_on_background_disabled"
+        android:gravity="center"
+        android:layoutDirection="rtl"
         android:paddingHorizontal="15dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:text="@string/add_note"
+        android:textSize="15sp"
+        app:backgroundTint="#1E000000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

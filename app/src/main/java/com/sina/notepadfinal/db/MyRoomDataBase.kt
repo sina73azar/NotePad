@@ -10,20 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Note::class],version = 1,exportSchema = false)
+@Database(entities = [Note::class], version = 1, exportSchema = false)
 abstract class MyRoomDataBase : RoomDatabase() {
-    override fun createOpenHelper(config: DatabaseConfiguration?): SupportSQLiteOpenHelper {
-        TODO("Not yet implemented")
-    }
-
-    override fun createInvalidationTracker(): InvalidationTracker {
-        TODO("Not yet implemented")
-    }
-
-    override fun clearAllTables() {
-        TODO("Not yet implemented")
-    }
-    abstract fun noteDao():NoteDao
+    abstract fun getNoteDao(): NoteDao
 
     companion object {
         private var INSTANCE: MyRoomDataBase? = null
@@ -33,8 +22,11 @@ abstract class MyRoomDataBase : RoomDatabase() {
             if (INSTANCE == null) {
                 synchronized(MyRoomDataBase::class.java) {
                     if (INSTANCE == null) {
-                        INSTANCE = Room.databaseBuilder(context.applicationContext, MyRoomDataBase::class.java, DB_NAME).build()
-                            //.allowMainThreadQueries() // Uncomment if you don't want to use RxJava or coroutines just yet (blocks UI thread)
+                        INSTANCE =
+                            Room.databaseBuilder(context, MyRoomDataBase::class.java, DB_NAME)
+                                .allowMainThreadQueries()
+                                .build()
+                        //.allowMainThreadQueries() // Uncomment if you don't want to use RxJava or coroutines just yet (blocks UI thread)
 //                            .addCallback(object : Callback() {
 //                                override fun onCreate(db: SupportSQLiteDatabase) {
 //                                    super.onCreate(db)
@@ -48,8 +40,7 @@ abstract class MyRoomDataBase : RoomDatabase() {
 
             return INSTANCE!!
         }
-}
-
+    }
 
 
 }

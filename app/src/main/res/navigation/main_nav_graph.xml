@@ -24,7 +24,7 @@
         android:id="@+id/editNoteFragment"
         android:name="com.sina.notepadfinal.ui.EditNoteFragment"
         android:label="fragment_edit_note"
-        tools:layout="@layout/fragment_edit_note" >
+        tools:layout="@layout/fragment_edit_note">
         <action
             android:id="@+id/action_editNoteFragment_to_listNoteFragment"
             app:destination="@id/listNoteFragment"
@@ -32,18 +32,16 @@
             app:exitAnim="@anim/slide_out"
             app:popEnterAnim="@anim/fade_out" />
         <argument
-            android:name="position"
-            app:argType="integer"
-            android:defaultValue="-1" />
+            android:name="curNote"
+            app:argType="com.sina.notepadfinal.datamodel.Note" />
     </fragment>
     <fragment
         android:id="@+id/readOnlyNoteFragment"
         android:name="com.sina.notepadfinal.ui.ReadOnlyNoteFragment"
         android:label="fragment_read_only_note"
-        tools:layout="@layout/fragment_read_only_note" >
+        tools:layout="@layout/fragment_read_only_note">
         <argument
-            android:name="curPos"
-            app:argType="integer"
-            android:defaultValue="0" />
+            android:name="curNote1"
+            app:argType="com.sina.notepadfinal.datamodel.Note" />
     </fragment>
 </navigation>

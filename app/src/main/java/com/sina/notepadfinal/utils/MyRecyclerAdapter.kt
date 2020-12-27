@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sina.notepadfinal.datamodel.Note
 import com.sina.notepadfinal.databinding.NotesItemBinding
-import com.sina.notepadfinal.ui.db
+
 
 class MyRecyclerAdapter(
-    private val listNotes: MutableList<Note>,
-    private val clickListener: ((position: Int, view: View) -> Unit),
-    private val longClickListener: ((position: Int, view: View) -> Boolean),
+      var listNotes: MutableList<Note>,
+    private val clickListener: ((note:Note,pos:Int, view: View) -> Unit),
+    private val longClickListener: ((note:Note, view: View) -> Boolean),
 ) : RecyclerView.Adapter<MyRecyclerAdapter.MyViewHolder>() {
 
     class MyViewHolder(val binding: NotesItemBinding) : RecyclerView.ViewHolder(binding.root)
@@ -32,17 +32,17 @@ class MyRecyclerAdapter(
 
 //        holder.binding.tvShowNoteValue.setOnClickListener(listener)
 //        holder.binding.tvTitle.setOnClickListener(listener)
-        holder.binding.imgDelete.setOnClickListener { clickListener(position, it) }
-        holder.binding.imgDelete.setOnLongClickListener { longClickListener(position, it) }
+        holder.binding.imgDelete.setOnClickListener { clickListener(item,position, it) }
+        holder.binding.imgDelete.setOnLongClickListener { longClickListener(item, it) }
 
-        holder.binding.tvShowNoteValue.setOnClickListener { clickListener (position,it)}
-        holder.binding.tvShowNoteValue.setOnLongClickListener { longClickListener(position, it) }
+        holder.binding.tvShowNoteValue.setOnClickListener { clickListener (item,position,it)}
+        holder.binding.tvShowNoteValue.setOnLongClickListener { longClickListener(item, it) }
 
-        holder.binding.tvTitle.setOnClickListener{clickListener(position,it)}
-        holder.binding.tvTitle.setOnLongClickListener{longClickListener(position,it)}
+        holder.binding.tvTitle.setOnClickListener{clickListener(item,position,it)}
+        holder.binding.tvTitle.setOnLongClickListener{longClickListener(item,it)}
 
-        holder.binding.imgEdit.setOnLongClickListener{longClickListener(position,it)}
-        holder.binding.imgEdit.setOnClickListener{clickListener(position,it)}
+        holder.binding.imgEdit.setOnLongClickListener{longClickListener(item,it)}
+        holder.binding.imgEdit.setOnClickListener{clickListener(item,position,it)}
 
 
 

@@ -1,115 +1,144 @@
 package com.sina.notepadfinal.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.sina.notepadfinal.utils.MyRecyclerAdapter
 import com.sina.notepadfinal.R
 import com.sina.notepadfinal.databinding.FragmentListNoteBinding
-import com.sina.notepadfinal.db.MyDb
+import com.sina.notepadfinal.datamodel.Note
 import com.sina.notepadfinal.db.MyRoomDataBase
+import com.sina.notepadfinal.db.NoteDao
+import com.sina.notepadfinal.utils.MyRecyclerAdapter
 
 
-val db=MyDb()
 class ListNoteFragment : Fragment() {
 
     lateinit var binding: FragmentListNoteBinding
-
+    private lateinit var dao: NoteDao
+    lateinit var adapter: MyRecyclerAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding= FragmentListNoteBinding.inflate(inflater,container,false)
+        binding = FragmentListNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dao = MyRoomDataBase.getDatabase(requireActivity().applicationContext).getNoteDao()
         //check if list is empty
 
         setupRecyclerView()
+        handleClicks()
 
+    }
+
+    private fun handleClicks() {
         binding.btnAddNote.setOnClickListener {
-            findNavController().navigate(ListNoteFragmentDirections.actionListNoteFragmentToEditNoteFragment(-1))
+            findNavController().navigate(
+                ListNoteFragmentDirections.actionListNoteFragmentToEditNoteFragment(
+                    Note("", "", 1)
+                )
+            )
         }
     }
 
     private fun setupRecyclerView() {
-
-        if (db.listOfNotes.isNotEmpty()) {
-            //lambda magic is about to happen...
-            val myClickListener:(position:Int,view:View)->Unit={ position: Int, view: View ->
-                when (view.id) {
-                    R.id.img_delete -> {
-//                        db.listOfNotes.removeAt(position)
-                        val roomDb = MyRoomDataBase.getDatabase(requireContext())
-                        val rowCount=roomDb.noteDao().getCount()
-                        val int1=rowCount?.value
-                        roomDb.noteDao().deleteById(position)
-                        binding.rvNotes.removeViewAt(position)
-                        binding.rvNotes.adapter?.notifyItemRemoved(position)
-                        if (int1 != null) {
-                            binding.rvNotes.adapter?.notifyItemRangeChanged(
-                                position,
-                                int1
-                            )
-                        };
-
-
-                    }
-                    R.id.img_edit -> {
-                        goToEditFragment(position)
-                    }
-                    R.id.tv_show_note_value,R.id.tv_title ->{
-                        goToShowNoteReadOnlyFragment(position,view)
-                    }
-
-                }
-            }
-
-            val myLongClickListener:(position:Int,view:View)->Boolean={ position: Int, view: View ->
-                when (view.id) {
-                    R.id.img_delete -> {
-                        Toast.makeText(activity, "LongClicked view is delete}", Toast.LENGTH_SHORT).show()
-                    }
-                    R.id.img_edit -> {
-                        Toast.makeText(activity, "LongClicked view is edit", Toast.LENGTH_SHORT).show()
-                    }
-                    R.id.tv_show_note_value,R.id.tv_title ->{
-                        Toast.makeText(activity, "LongClicked view is note", Toast.LENGTH_SHORT).show()
-
-                    }
-
-                }
-                true
-            }
-            val mAdapter=MyRecyclerAdapter(db.listOfNotes,myClickListener,myLongClickListener)
-            binding.tvShowEmptyList.visibility = View.GONE
+        val noteList = dao.getNoteList()
+        adapter=MyRecyclerAdapter(
+            noteList,
+            clickListener,
+            myLongClickListener
+        )
+        if (noteList.count() != 0) {
+            //we are going to show the list
             binding.rvNotes.visibility = View.VISIBLE
-            binding.rvNotes.adapter = mAdapter
-
+            binding.tvShowEmptyList.visibility = View.GONE
+            //set adapter to rv
+            binding.rvNotes.adapter = adapter
+        } else {
+            //list is empty so we hide it and show a text only
+            binding.tvShowEmptyList.visibility = View.VISIBLE
+            binding.rvNotes.visibility = View.GONE
         }
 
     }
-    private fun goToShowNoteReadOnlyFragment(position:Int,view: View) {
-        val navDirections=ListNoteFragmentDirections.actionListNoteFragmentToReadOnlyNoteFragment(position)
+
+
+    private val clickListener: (Note, Int, View) -> (Unit) = { note: Note, pos: Int, view: View ->
+        when (view.id) {
+            R.id.img_delete -> {
+                dao.deleteNote(note)
+               binding.rvNotes.removeViewAt(pos)
+                adapter.notifyItemRemoved(pos)
+//                adapter.notifyItemRangeChanged(pos, dao.getCount());
+
+                adapter.listNotes=dao.getNoteList()
+
+            }
+
+            R.id.img_edit -> {
+                goToEditFragment(note)
+            }
+            R.id.tv_show_note_value, R.id.tv_title -> {
+                goToShowNoteReadOnlyFragment(note)
+            }
+            else -> {
+                Toast.makeText(requireContext(), note.title, Toast.LENGTH_SHORT).show()
+            }
+
+        }
+    }
+    private val myLongClickListener: (Note, View) -> Boolean = { note: Note, view: View ->
+        when (view.id) {
+            R.id.img_delete -> {
+                Toast.makeText(
+                    activity,
+                    "LongClicked view is delete}",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+            R.id.img_edit -> {
+                Toast.makeText(activity, "LongClicked view is edit", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            R.id.tv_show_note_value, R.id.tv_title -> {
+                Toast.makeText(activity, "LongClicked view is note", Toast.LENGTH_SHORT)
+                    .show()
+
+            }
+
+        }
+        true
+    }
+
+
+    private fun goToShowNoteReadOnlyFragment(note: Note) {
+        val navDirections =
+            ListNoteFragmentDirections.actionListNoteFragmentToReadOnlyNoteFragment(note)
         findNavController().navigate(navDirections)
     }
 
-    private fun goToEditFragment(position: Int) {
+    private fun goToEditFragment(note: Note) {
 
         val navDirections =
-            ListNoteFragmentDirections.actionListNoteFragmentToEditNoteFragment(position)
+            ListNoteFragmentDirections.actionListNoteFragmentToEditNoteFragment(note)
         findNavController().navigate(navDirections)
 
     }
 
-
 }
+
+
+
+
+
+
+

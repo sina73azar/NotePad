@@ -1,3 +1,4 @@
+
 package com.sina.notepadfinal.ui
 
 import android.os.Bundle
@@ -27,13 +28,11 @@ class ReadOnlyNoteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val curPos= ReadOnlyNoteFragmentArgs.fromBundle(requireArguments()).curPos
-        curPos.let {
-
-            val item = db.listOfNotes[it]
-            binding.tvShowNoteValueFrgReadOnly.text=item.noteValue
-            binding.tvDateFrgReadOnly.text=item.date.reformat()
-            binding.tvTitleFrgReadOnly.text=item.title
+        val curNote= ReadOnlyNoteFragmentArgs.fromBundle(requireArguments()).curNote1
+        curNote.let {
+            binding.tvShowNoteValueFrgReadOnly.text=it.noteValue
+            binding.tvDateFrgReadOnly.text=it.date.reformat()
+            binding.tvTitleFrgReadOnly.text=it.title
         }
     }
 
